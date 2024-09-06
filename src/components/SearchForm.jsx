@@ -7,7 +7,7 @@ const SearchForm = ({ inputValue, handleInputChange, handleSubmit }) => {
         type="text"
         value={inputValue}
         onChange={handleInputChange}
-        placeholder="Wpisz miasto"
+        placeholder="Wpisz miasto."
         className="input"
       />
       <button className="button" type="submit">
