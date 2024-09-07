@@ -43,7 +43,8 @@ const Forecast = ({ forecastData }) => {
         return (
           <div key={date} className={`forecast${index + 1}`}>
             <h3>
-              {dayData.dayOfWeek} ({date}) :
+              {dayData.dayOfWeek}
+              <br></br> ({date})
             </h3>
             <span className="material-icons" style={{ fontSize: "48px" }}>
               {weatherIcon}
