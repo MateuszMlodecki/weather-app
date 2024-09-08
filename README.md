@@ -14,10 +14,10 @@ CSS: Stylizacja komponentów aplikacji.
 
 Instalacja:
 
-`git clone https://github.com/MateuszMlodecki/weather-app.git
+````git clone https://github.com/MateuszMlodecki/weather-app.git
 cd weather-app
 npm install
-npm run start`
+npm run start```
 
 Konfiguracja:
 API Key: Upewnij się, że masz swój klucz API do OpenWeatherMap. Możesz go dodać w plikach konfiguracyjnych lub bezpośrednio w kodzie, jeśli nie używasz zmiennych środowiskowych.
@@ -25,3 +25,4 @@ Jak Używać
 Otwórz aplikację w przeglądarce.
 Wpisz nazwę miasta w polu wyszukiwania i kliknij „Szukaj” lub pozwól aplikacji automatycznie ustalić Twoją lokalizację.
 Przeglądaj aktualne warunki pogodowe oraz prognozy na nadchodzące dni.
+````
