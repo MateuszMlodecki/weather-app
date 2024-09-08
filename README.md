@@ -14,7 +14,8 @@ CSS: Stylizacja komponentów aplikacji.
 
 Instalacja:
 
-```git clone https://github.com/MateuszMlodecki/weather-app.git
+```
+git clone https://github.com/MateuszMlodecki/weather-app.git
 cd weather-app
 npm install
 npm run start
