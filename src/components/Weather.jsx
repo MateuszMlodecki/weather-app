@@ -4,12 +4,15 @@ import SearchForm from "./SearchForm.jsx";
 import CurrentWeather from "./CurrentWeather";
 import Forecast from "./Forecast";
 import "./weather.css";
+import { getWeatherBackground } from "../utils/weatherIcons.js";
 
 const Weather = () => {
   const [inputValue, setInputValue] = useState("");
   const [location, setLocation] = useState("");
   const [weatherData, setWeatherData] = useState({});
   const [forecastData, setForecastData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const getLocation = async () => {
@@ -26,14 +29,17 @@ const Weather = () => {
               setLocation(city);
               setInputValue(city);
             } catch (error) {
+              setError("Error fetching location.");
               console.error("Error fetching location:", error);
             }
           },
           (error) => {
+            setError("Geolocation error.");
             console.error("Geolocation error:", error);
           }
         );
       } else {
+        setError("Geolocation is not supported by this browser.");
         console.error("Geolocation is not supported by this browser.");
       }
     };
@@ -53,11 +59,19 @@ const Weather = () => {
   useEffect(() => {
     const fetchWeatherData = async () => {
       if (location) {
+        setLoading(true);
         try {
           const data = await getWeatherData(location);
-          setWeatherData(data);
+          if (data && data.weather) {
+            setWeatherData(data);
+          } else {
+            setError("Dane pogody są niedostępne.");
+          }
         } catch (error) {
-          console.error("Error fetching weather data:", error);
+          setError("Error pobierania danych pogody.");
+          console.error("Error pobierania danych pogody:", error);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -69,23 +83,47 @@ const Weather = () => {
       if (location) {
         try {
           const data = await getForecastData(location);
-          setForecastData(data);
+          if (data && data.list) {
+            setForecastData(data);
+          } else {
+            setError("Dane pogody są niedostępne.");
+          }
         } catch (error) {
-          console.error("Error fetching forecast data:", error);
+          setError("Error pobierania danych prognozy pogody.");
+          console.error("Error pobierania danych prognozy pogody:", error);
         }
       }
     };
     fetchForecastData();
   }, [location]);
 
+  const weatherBackground = weatherData.weather
+    ? getWeatherBackground(weatherData.weather[0]?.id)
+    : null;
+
   return (
     <div className="container">
-      <div className="firstTemplate">
+      <div
+        className="firstTemplate"
+        style={{
+          backgroundImage: weatherBackground
+            ? `url(${weatherBackground})`
+            : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <SearchForm
           inputValue={inputValue}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
         />
+        {loading && (
+          <div>
+            <p>Loading...</p>
+          </div>
+        )}
+        {error && <p>{error}</p>}
         <CurrentWeather location={location} weatherData={weatherData} />
       </div>
       <Forecast forecastData={forecastData} />

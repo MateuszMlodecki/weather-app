@@ -1,11 +1,11 @@
 import React from "react";
-import { getWeatherIcon } from "../utils/weatherIcons";
+import { getWeatherBackground, getWeatherIcon } from "../utils/weatherIcons";
 
 const Forecast = ({ forecastData }) => {
   if (!forecastData || !forecastData.list) return null;
 
   const forecastItems = Object.entries(
-    forecastData.list.reduce((acc, day) => {
+    forecastData.list.reduce((dailyForecast, day) => {
       const date = new Date(day.dt * 1000);
       const dayOfWeek = [
         "Niedziela",
@@ -16,23 +16,23 @@ const Forecast = ({ forecastData }) => {
         "Piątek",
         "Sobota",
       ][date.getDay()];
-      const formattedDate = date.toLocaleDateString();
+      const dateString = date.toLocaleDateString();
 
-      if (!acc[formattedDate]) {
-        acc[formattedDate] = {
+      if (!dailyForecast[dateString]) {
+        dailyForecast[dateString] = {
           dayOfWeek: dayOfWeek,
           maxTemp: day.main.temp_max,
           wind: day.wind,
           weatherId: day.weather[0].id,
         };
       } else {
-        acc[formattedDate].maxTemp = Math.max(
-          acc[formattedDate].maxTemp,
+        dailyForecast[dateString].maxTemp = Math.max(
+          dailyForecast[dateString].maxTemp,
           day.main.temp_max
         );
       }
 
-      return acc;
+      return dailyForecast;
     }, {})
   ).slice(1, 5);
 
@@ -40,8 +40,17 @@ const Forecast = ({ forecastData }) => {
     <>
       {forecastItems.map(([date, dayData], index) => {
         const weatherIcon = getWeatherIcon(dayData.weatherId);
+        const weatherBackground = getWeatherBackground(dayData.weatherId);
         return (
-          <div key={date} className={`forecast${index + 1}`}>
+          <div
+            key={date}
+            className={`forecast${index + 1}`}
+            style={{
+              backgroundImage: `url(${weatherBackground})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
             <h3>
               {dayData.dayOfWeek}
               <br></br> ({date})
