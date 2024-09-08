@@ -14,19 +14,10 @@ CSS: Stylizacja komponentów aplikacji.
 
 Instalacja:
 
-git clone https://github.com/MateuszMlodecki/weather-app.git
-
-Przejdź do katalogu projektu:
-
+`git clone https://github.com/MateuszMlodecki/weather-app.git
 cd weather-app
-
-Zainstaluj zależności:
-
 npm install
-
-Uruchom aplikację:
-
-npm run start
+npm run start`
 
 Konfiguracja:
 API Key: Upewnij się, że masz swój klucz API do OpenWeatherMap. Możesz go dodać w plikach konfiguracyjnych lub bezpośrednio w kodzie, jeśli nie używasz zmiennych środowiskowych.
