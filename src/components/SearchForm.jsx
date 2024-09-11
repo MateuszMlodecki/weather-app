@@ -1,22 +1,20 @@
+import { Box, Button, TextField } from "@mui/material";
 import React from "react";
 
-const SearchForm = ({ inputValue, handleInputChange, handleSubmit }) => {
+export const SearchForm = ({ inputValue, handleInputChange, handleSubmit }) => {
   return (
-    <form onSubmit={handleSubmit} className="form">
-      <div className="input-container">
-        <input
-          type="text"
+    <form onSubmit={handleSubmit}>
+      <Box>
+        <TextField
+          type="search"
           value={inputValue}
           onChange={handleInputChange}
-          placeholder="Wpisz miasto"
-          className="input"
+          label="Wpisz miasto"
         />
-        <button className="button" type="submit">
+        <Button type="submit" variant="contained">
           Szukaj
-        </button>
-      </div>
+        </Button>
+      </Box>
     </form>
   );
 };
-
-export default SearchForm;

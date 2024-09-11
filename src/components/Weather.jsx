@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { getWeatherData, getForecastData } from "../utils/api.js";
-import SearchForm from "./SearchForm.jsx";
+import { SearchForm } from "./SearchForm.jsx";
 import CurrentWeather from "./CurrentWeather";
 import Forecast from "./Forecast";
-import "./weather.css";
 import { getWeatherBackground } from "../utils/weatherIcons.js";
+import { Box, Card, Grid2 as Grid, Paper } from "@mui/material";
 
-const Weather = () => {
+export const Weather = () => {
   const [inputValue, setInputValue] = useState("");
   const [location, setLocation] = useState("");
   const [weatherData, setWeatherData] = useState({});
@@ -14,37 +14,56 @@ const Weather = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const getLocation = async () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&appid=b4d24534442959bc8a331c11f5903ea8`;
-            try {
-              const response = await fetch(url);
-              const data = await response.json();
-              const city = data[0].name;
-              setLocation(city);
-              setInputValue(city);
-            } catch (error) {
-              setError("Error fetching location.");
-              console.error("Error fetching location:", error);
-            }
-          },
-          (error) => {
-            setError("Geolocation error.");
-            console.error("Geolocation error:", error);
-          }
-        );
+  const getLocation = async (cityName) => {
+    const url = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=b4d24534442959bc8a331c11f5903ea8`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.length > 0) {
+        const city = data[0].name;
+        setLocation(city);
       } else {
-        setError("Geolocation is not supported by this browser.");
-        console.error("Geolocation is not supported by this browser.");
+        setError("Miasto nie znalezione.");
       }
-    };
-    getLocation();
-  }, []);
+    } catch (error) {
+      setError("Error podczas pobierania lokalizacji.");
+      console.error("Error podczas pobierania lokalizacji:", error);
+    }
+  };
+
+  const getLocationLive = async (lat, lon) => {
+    const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=b4d24534442959bc8a331c11f5903ea8`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.length > 0) {
+        const city = data[0].name;
+        setLocation(city);
+      } else {
+        setError("Nie udało się uzyskać lokalizacji, wprowadź nazwę miasta");
+      }
+    } catch (error) {
+      setError("Error podczas reverse geocodingu.");
+      console.error("Error podczas lokalizacji:", error);
+    }
+  };
+
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          getLocationLive(latitude, longitude);
+        },
+        (error) => {
+          setError("Nie można uzyskać dostępu do lokalizacji użytkownika");
+          console.error("Geolocation error", error);
+        }
+      );
+    } else {
+      setError("Geolokalizacje nie jest wspierana w tej przeglądarce");
+    }
+  };
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -52,7 +71,8 @@ const Weather = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLocation(inputValue);
+    setError(null);
+    await getLocation(inputValue);
     setInputValue("");
   };
 
@@ -75,6 +95,11 @@ const Weather = () => {
         }
       }
     };
+
+    if (!location) {
+      getUserLocation();
+    }
+
     fetchWeatherData();
   }, [location]);
 
@@ -86,7 +111,7 @@ const Weather = () => {
           if (data && data.list) {
             setForecastData(data);
           } else {
-            setError("Dane pogody są niedostępne.");
+            setError("Dane prognozy pogody są niedostępne.");
           }
         } catch (error) {
           setError("Error pobierania danych prognozy pogody.");
@@ -94,41 +119,53 @@ const Weather = () => {
         }
       }
     };
+
     fetchForecastData();
   }, [location]);
-
   const weatherBackground = weatherData.weather
     ? getWeatherBackground(weatherData.weather[0]?.id)
     : null;
 
   return (
-    <div className="container">
-      <div
-        className="firstTemplate"
-        style={{
-          backgroundImage: weatherBackground
-            ? `url(${weatherBackground})`
-            : "none",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <SearchForm
-          inputValue={inputValue}
-          handleInputChange={handleInputChange}
-          handleSubmit={handleSubmit}
-        />
-        {loading && (
-          <div>
-            <p>Loading...</p>
-          </div>
-        )}
-        {error && <p>{error}</p>}
-        <CurrentWeather location={location} weatherData={weatherData} />
-      </div>
-      <Forecast forecastData={forecastData} />
-    </div>
+    <Grid
+      columns={25}
+      container
+      spacing={2}
+      sx={{
+        justifyContent: "space-between",
+        padding: "20px",
+        flexWrap: "nowrap",
+      }}
+    >
+      <Grid columns={5 / 25}>
+        <Paper
+          sx={{
+            padding: "20px",
+            backgroundImage: weatherBackground
+              ? `url(${weatherBackground})`
+              : "none",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        >
+          <SearchForm
+            inputValue={inputValue}
+            handleInputChange={handleInputChange}
+            handleSubmit={handleSubmit}
+          />
+          {loading && (
+            <div>
+              <p>Loading...</p>
+            </div>
+          )}
+          {error && <p>{error}</p>}
+
+          <CurrentWeather location={location} weatherData={weatherData} />
+        </Paper>
+      </Grid>
+      <Grid size="grow">
+        <Forecast forecastData={forecastData} />
+      </Grid>
+    </Grid>
   );
 };
-
-export default Weather;

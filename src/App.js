@@ -1,6 +1,6 @@
 import React from "react";
-import Weather from "./components/Weather";
-import "./components/weather.css";
+import { Weather } from "./components/Weather";
+// import "./components/weather.css";
 
 const App = () => {
   return (
