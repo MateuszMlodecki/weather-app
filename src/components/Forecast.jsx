@@ -1,8 +1,8 @@
 import React from "react";
 import { getWeatherBackground, getWeatherIcon } from "../utils/weatherIcons";
-import { Box, Grid2 as Grid, Paper, Stack, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 
-const Forecast = ({ forecastData }) => {
+export const Forecast = ({ forecastData }) => {
   if (!forecastData || !forecastData.list) return null;
   const uniqueDays = new Set();
   const dailyForecast = [];
@@ -44,17 +44,22 @@ const Forecast = ({ forecastData }) => {
   // console.log("forecastItems",forecastItems)
 
   return (
-    <Grid container spacing={4} columns={20 / 25}>
+    <>
       {forecastItems.map((dayData) => {
         const weatherIcon = getWeatherIcon(dayData.weatherId);
         const weatherBackground = dayData.weatherId
           ? getWeatherBackground(dayData.weatherId)
           : null;
         return (
-          <Grid>
+          <Box
+            sx={{
+              width: "350px",
+            }}
+          >
             <Paper
               sx={{
                 padding: "20px",
+                height: "280px",
                 backgroundImage: weatherBackground
                   ? `url(${weatherBackground})`
                   : "none",
@@ -84,11 +89,9 @@ const Forecast = ({ forecastData }) => {
                 </Stack>
               </Box>
             </Paper>
-          </Grid>
+          </Box>
         );
       })}
-    </Grid>
+    </>
   );
 };
-
-export default Forecast;
